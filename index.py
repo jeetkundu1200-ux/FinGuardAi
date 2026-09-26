@@ -19,10 +19,20 @@ from fastapi.middleware.cors import CORSMiddleware
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "data" / "transactions.json"
 
-with DATA_FILE.open("r", encoding="utf-8") as f:
-    TRANSACTIONS: list[dict] = json.load(f)
+DATA_LOAD_ERROR: Optional[str] = None
+TRANSACTIONS: list[dict] = []
+BY_UTR: dict[str, dict] = {}
 
-BY_UTR = {str(row.get("UTR_ID", "")).upper(): row for row in TRANSACTIONS}
+try:
+    with DATA_FILE.open("r", encoding="utf-8") as f:
+        TRANSACTIONS = json.load(f)
+    BY_UTR = {str(row.get("UTR_ID", "")).upper(): row for row in TRANSACTIONS}
+except Exception as exc:  # noqa: BLE001 - deliberately broad: this must never crash cold start
+    # Loading the dataset must never take down the whole function. If the file is
+    # missing (e.g. not bundled by the deployment) or malformed, keep the app
+    # running with an empty dataset and surface a clear error via /api/health
+    # instead of a bare 500 FUNCTION_INVOCATION_FAILED.
+    DATA_LOAD_ERROR = f"{type(exc).__name__}: {exc}"
 
 app = FastAPI(
     title="FinGuard AI API",
@@ -62,19 +72,27 @@ def api_root():
     return {
         "name": "FinGuard AI API",
         "version": "1.0.0",
-        "status": "online",
+        "status": "online" if DATA_LOAD_ERROR is None else "degraded",
         "records": len(TRANSACTIONS),
+        "data_load_error": DATA_LOAD_ERROR,
         "docs": "/api/docs",
     }
 
 
 @app.get("/api/health")
 def health():
+    if DATA_LOAD_ERROR is not None:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Dataset failed to load: {DATA_LOAD_ERROR}",
+        )
     return {"status": "healthy", "records_loaded": len(TRANSACTIONS)}
 
 
 @app.get("/api/transaction/{utr}")
 def get_transaction(utr: str):
+    if DATA_LOAD_ERROR is not None:
+        raise HTTPException(status_code=503, detail=f"Dataset unavailable: {DATA_LOAD_ERROR}")
     row = BY_UTR.get(utr.upper())
     if row is None:
         raise HTTPException(status_code=404, detail="UTR ID not found")
