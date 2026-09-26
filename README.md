@@ -1,556 +1,319 @@
 # 🛡️ FinGuard AI
 
-### AI-Based Real-Time Financial Fraud Detection
+> A modern transaction-risk lookup and fraud-search application with a FastAPI backend, a responsive frontend, and a synthetic 15,000-record transaction dataset.
 
-> **FinGuard AI** is a fintech fraud-risk platform that lets users look up a UTR and inspect transaction-level risk indicators from a **15,000-record synthetic/demo transaction dataset**.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone)
+![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)
+![Dataset](https://img.shields.io/badge/Dataset-15%2C000%20synthetic%20records-5b8cff)
 
-[![FinTech](https://img.shields.io/badge/Theme-Fin--Tech-5b7cff?style=for-the-badge)](#)
-[![Records](https://img.shields.io/badge/Dataset-15%2C000%20Records-21e6a1?style=for-the-badge)](#)
-[![Status](https://img.shields.io/badge/Status-Demo-ffb020?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-Unspecified-lightgrey?style=for-the-badge)](#-license)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)](#-contributing)
+## ✨ Overview
 
----
+FinGuard AI is a demonstration fraud-analysis application designed to make transaction investigation quick and understandable.
 
-## 📑 Table of Contents
+It supports:
 
-- [What is FinGuard AI?](#-what-is-finguard-ai)
-- [Current Application Features](#-current-application-features)
-- [Example](#-example)
-- [Current Implementation](#️-current-implementation)
-- [Proposed AI Fraud-Detection Architecture](#-proposed-ai-fraud-detection-architecture)
-- [Proposed Real-Time Flow](#️-proposed-real-time-flow)
-- [Technology Direction](#️-technology-direction)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Dataset](#-dataset)
-- [UI Design](#-ui-design)
-- [Known Limitations](#-known-limitations)
-- [FAQ](#-faq)
-- [Roadmap](#️-roadmap)
-- [Built With](#-built-with)
-- [HyperFusion 2026](#-hyperfusion-2026)
-- [Team NEXORA](#-team-nexora)
-- [Contributing](#-contributing)
-- [Research & References](#-research--references)
-- [Disclaimer](#️-disclaimer)
-- [License](#-license)
-- [Contact](#-contact)
+- 🔎 Exact UTR transaction lookup
+- 💬 Natural-language-style fraud search in the frontend
+- 📊 Risk scoring from 0–100
+- 🚨 LOW / MEDIUM / HIGH risk classification
+- 💳 UPI and Card transaction filtering
+- 📍 State and city filtering
+- 💰 Amount and risk-score ranges
+- ❤️ Transaction and fraud statistics
+- 📚 Automatic FastAPI Swagger/OpenAPI documentation
+- ☁️ Vercel-ready serverless deployment
 
----
+The supplied frontend is a self-contained demo UI. The backend in `api/index.py` exposes the same transaction data through a clean REST API.
 
-## 🚀 Dashboard Preview
+## 🧠 Risk model used by the demo
 
-Add the dashboard screenshot generated for this project to:
+The dataset contains a `Risk_Score_0_100` field.
 
-```text
-assets/finguard-dashboard-preview.png
-```
-
-Then this image will appear automatically on GitHub:
-
-![FinGuard AI Dashboard Preview](assets/finguard-dashboard-preview.png)
-
----
-
-## 🎯 What is FinGuard AI?
-
-FinGuard AI is a **UTR Transaction Risk Lookup** application built around a transaction dataset containing **15,000 synthetic/demo records**.
-
-A user enters a UTR ID, and the application:
-
-1. Searches the local transaction dataset.
-2. Retrieves the matching transaction.
-3. Displays a **0–100 risk score**.
-4. Assigns a risk level.
-5. Shows transaction, device, network, behavioural and security attributes.
-6. Displays the recorded fraud-risk reason.
-
-The current lookup application is a **working front-end/demo implementation**. The larger AI fraud-detection architecture described below is the proposed production direction for the project.
-
----
-
-## ✨ Current Application Features
-
-### 🔎 UTR Lookup
-
-Enter a UTR ID such as:
-
-```text
-UTR26082400001107
-```
-
-The application searches the embedded transaction dataset and returns the matching record.
-
-### 📊 Risk Score
-
-Each transaction contains a recorded `Risk_Score_0_100` value.
-
-The current application uses these thresholds:
-
-| Score | Risk Level |
+| Score | Risk level |
 |---:|---|
-| `< 30` | 🟢 Low Risk |
-| `30–69` | 🟡 Medium Risk |
-| `≥ 70` | 🔴 High Risk |
+| `< 30` | 🟢 LOW |
+| `30–69` | 🟡 MEDIUM |
+| `≥ 70` | 🔴 HIGH |
 
-### 🧾 Transaction Details
+These thresholds are demonstration rules, not a production financial-risk model.
 
-The lookup result can display:
-
-- Transaction ID
-- Fraud / Genuine label
-- Amount
-- Payment method
-- Sender
-- Receiver
-- UPI ID
-- Card token
-- Timestamp
-- City
-- State
-- Network type
-- Device type
-- Device trust
-- Beneficiary type
-- Previous transactions with receiver
-- Transaction frequency
-- Time pattern
-- Location pattern
-- Authentication signal
-- Network risk
-- Account security
-- Behaviour pattern
-
-### 🧠 Risk Explanation
-
-Each dataset record contains a `Fraud_Risk_Reason` field, which is displayed with the transaction result.
-
-### 📱 Responsive Interface
-
-The current interface is designed as a lightweight responsive web page with a dark fintech-style visual design.
-
-### 💻 Prerequisites / Browser Support
-
-No installation, build step, or backend is required to run the current demo.
-
-- Any modern browser (Chrome, Firefox, Edge, Safari — latest two versions)
-- JavaScript enabled
-- No internet connection required after the page is loaded, since the dataset is embedded client-side
-- Optional: Python 3 (or any static file server) if you prefer serving the file over `http://` instead of opening it directly via `file://`
-
----
-
-## 🧪 Example
-
-Example transaction lookup:
-
-```text
-UTR ID
-UTR26082400001107
-
-Transaction
-TXN26082400001107
-
-Label
-Fraud
-
-Risk Score
-85 / 100
-
-Risk Level
-HIGH RISK
-
-Reason
-Authentication and velocity anomalies
-```
-
-> The dataset is synthetic/demo data and should not be treated as real financial transaction data.
-
----
-
-## 🏗️ Current Implementation
-
-The current uploaded application is intentionally lightweight:
-
-```text
-index.html
-README.md
-```
-
-The main application is contained in a single self-contained HTML file.
-
-### Current architecture
-
-```text
-                ┌──────────────────────┐
-                │      User / UI       │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │     UTR Input        │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │  Local Transaction   │
-                │   Dataset (15,000)   │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │   UTR Lookup / Map   │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Risk Score + Details │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │ Risk Result Display  │
-                └──────────────────────┘
-```
-
-The application creates a lookup map from the embedded records and matches the entered UTR against `UTR_ID`.
-
----
-
-## 🤖 Proposed AI Fraud-Detection Architecture
-
-For the full FinGuard AI vision, the proposed architecture places the fraud engine between a payment gateway and the bank/core system.
-
-```text
-UPI / CARD TRANSACTION
-          │
-          ▼
-     API GATEWAY
-          │
-          ▼
-  FEATURE EXTRACTION
-          │
-          ▼
-      AI FRAUD MODEL
-          │
-          ▼
-   RISK SCORING ENGINE
-          │
-     ┌────┼────┐
-     ▼    ▼    ▼
-   ALLOW FLAG BLOCK
-```
-
-### Detection approach
-
-The proposed system combines:
-
-- **Supervised machine learning**
-- **Anomaly detection**
-- **Rule-based detection**
-- **Behavioural profiling**
-- **Continuous 0–100 risk scoring**
-- **Feedback-driven adaptive learning**
-
-The HyperFusion 2026 proposal identifies:
-
-- XGBoost / Random Forest for supervised classification
-- Autoencoder / Isolation Forest for anomaly detection
-- FastAPI / Flask for inference APIs
-- Kafka for event streaming
-- MongoDB / PostgreSQL for storage
-- AWS / cloud deployment
-- React.js for the application interface
-- OAuth2 / encryption for security
-
-These technologies describe the **proposed architecture**, not all components currently implemented in the uploaded demo.
-
----
-
-## ⚙️ Proposed Real-Time Flow
-
-```text
-Transaction
-     │
-     ▼
-Feature Extraction
-     │
-     ├── Amount
-     ├── Time
-     ├── Location
-     ├── Device
-     ├── Network
-     ├── Authentication
-     ├── Account Security
-     └── Behaviour Pattern
-     │
-     ▼
-ML + Anomaly Detection + Rules
-     │
-     ▼
-Risk Score (0–100)
-     │
-     ├── 0–29   → ALLOW
-     ├── 30–69  → FLAG / REVIEW
-     └── 70–100 → BLOCK
-```
-
-> These proposed boundaries match the Low / Medium / High thresholds used in the current demo (see [Risk Score](#-risk-score)) so the two stay consistent as the project evolves.
-
----
-
-## 🛠️ Technology Direction
-
-| Layer | Current Demo | Proposed Full System |
-|---|---|---|
-| Interface | HTML / CSS / JavaScript | React.js |
-| Dataset | Embedded synthetic records | Database / transaction stream |
-| Lookup | Client-side UTR map | API service |
-| Risk value | Stored dataset score | ML + anomaly + rules |
-| API | Not required by current demo | FastAPI / Flask |
-| Streaming | Not implemented | Apache Kafka |
-| Database | Embedded dataset | MongoDB / PostgreSQL |
-| ML | Not executed in current UI | XGBoost / Random Forest / anomaly models |
-| Deployment | Static web page | Cloud / AWS |
-| Security | Demo scope | OAuth2 / encryption |
-
----
-
-## 📁 Project Structure
+## 📦 Project structure
 
 ```text
 FinGuard-AI/
-│
-├── index.html
-├── README.md
-│
-└── assets/
-    └── finguard-dashboard-preview.png
-```
-
-If you later split the application into a frontend/backend architecture, the repository can evolve into:
-
-```text
-FinGuard-AI/
-├── frontend/
-├── backend/
-├── ml/
+├── api/
+│   └── index.py              # FastAPI backend / Vercel Function
 ├── data/
-├── assets/
+│   └── transactions.json     # 15,000 synthetic transactions
+├── docs/
+│   └── API.md                # API reference
+├── index.html                # Frontend demo
+├── requirements.txt          # Python dependencies
+├── vercel.json               # Vercel configuration
+├── .env.example              # Environment variable template
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
----
+## 🚀 Run locally
 
-## 🚀 Getting Started
-
-### Option 1 — Open directly
-
-The current application is self-contained.
-
-Open:
-
-```text
-index.html
-```
-
-in a modern web browser.
-
-### Option 2 — Run with a local web server
-
-From the project directory:
+### 1. Clone the repository
 
 ```bash
-python -m http.server 8000
+git clone https://github.com/YOUR-USERNAME/FinGuard-AI.git
+cd FinGuard-AI
 ```
 
-Then open:
+### 2. Create a virtual environment
+
+macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Windows:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Start the API
+
+```bash
+uvicorn api.index:app --reload
+```
+
+The API will be available at:
 
 ```text
-http://localhost:8000
+http://127.0.0.1:8000
 ```
 
----
-
-## 🔍 Dataset
-
-The current demo contains:
+Swagger UI:
 
 ```text
-15,000 transaction records
+http://127.0.0.1:8000/api/docs
 ```
 
-The records include UTR IDs, transaction IDs, labels, amounts, payment methods, sender/receiver information, timestamps, location, device/network attributes, behavioural signals, risk scores and fraud-risk reasons.
+### 5. Open the frontend
 
-**Important:** The supplied dataset is explicitly described as **synthetic/demo data**. It must not be interpreted as real customer or banking data.
+For the static frontend, you can open `index.html` directly in a browser.
 
----
+> Note: the supplied `index.html` currently contains its own embedded demo dataset and frontend search logic. The new FastAPI backend is provided as a separate API layer so the project can be migrated to API-backed frontend requests without changing the visual design.
 
-## 🎨 UI Design
+## ☁️ Deploy to Vercel
 
-The current interface follows a dark fintech dashboard style with:
+Vercel supports Python Functions and can deploy a FastAPI backend from the `api/` directory. The project structure here follows that deployment model. 
 
-- Dark navy background
-- Blue primary actions
-- Green low-risk indicators
-- Amber medium-risk indicators
-- Red high-risk indicators
-- Transaction result cards
-- Risk score presentation
-- Responsive layout
+### Option A — GitHub → Vercel
 
-The visual direction is intended to communicate a **financial-security / fraud-monitoring** product rather than a generic data lookup page.
+1. Push this folder to GitHub.
+2. Open Vercel.
+3. Import the GitHub repository.
+4. Keep the project root at the repository root.
+5. Deploy.
+6. After deployment, test:
 
----
+```text
+https://YOUR-PROJECT.vercel.app/api/health
+https://YOUR-PROJECT.vercel.app/api/stats
+https://YOUR-PROJECT.vercel.app/api/docs
+```
 
-## ⚠️ Known Limitations
+### Option B — Vercel CLI
 
-Being transparent about the current demo's scope:
+Install the CLI:
 
-- **No real detection logic.** Risk scores and reasons are pre-computed values stored in the dataset, not the output of a live model — the app performs lookup and display only.
-- **No backend or persistence.** Everything runs client-side in the browser; there is no API, database, or server component yet.
-- **Not built for real transactions.** The dataset is synthetic and the app has no authentication, encryption, or audit logging — it is not suitable for production or real financial data.
-- **Single-file architecture.** `index.html` currently contains markup, styles, and the embedded dataset together, which will need to be split out as the project grows (see [Project Structure](#-project-structure)).
+```bash
+npm i -g vercel
+```
 
----
+Then:
 
-## ❓ FAQ
+```bash
+vercel
+```
 
-**Q: Can I look up a real transaction?**
-No. The dataset is 15,000 synthetic/demo records — it contains no real customer or banking data.
+For production:
 
-**Q: Does this actually detect fraud in real time?**
-Not yet. The current app looks up a pre-scored record by UTR. Real-time detection is described in [Proposed AI Fraud-Detection Architecture](#-proposed-ai-fraud-detection-architecture) as the intended production direction.
+```bash
+vercel --prod
+```
 
-**Q: Do I need to install anything to try it?**
-No — see [Prerequisites / Browser Support](#-prerequisites--browser-support). Just open `index.html` in a browser.
+## 🔌 API endpoints
 
-**Q: Where do I find a sample UTR to try?**
-See the [Example](#-example) section for a sample UTR ID and its expected result.
+### Health
 
----
+```http
+GET /api/health
+```
 
-## 🗺️ Roadmap
+Example response:
 
-### Phase 1 — Current Demo
+```json
+{
+  "status": "healthy",
+  "records_loaded": 15000
+}
+```
 
-- [x] UTR lookup
-- [x] 15,000-record dataset
-- [x] Risk score display
-- [x] Low / Medium / High classification
-- [x] Transaction detail display
-- [x] Fraud-risk reason display
-- [x] Responsive UI
+### API information
 
-### Phase 2 — AI Engine
+```http
+GET /api
+```
 
-- [ ] Feature engineering pipeline
-- [ ] Fraud classification model
-- [ ] Anomaly detection model
-- [ ] Rule engine
-- [ ] Model evaluation
-- [ ] Explainable risk factors
-- [ ] Model feedback loop
+### Transaction lookup
 
-### Phase 3 — Production Architecture
+```http
+GET /api/transaction/{UTR_ID}
+```
 
-- [ ] FastAPI / Flask backend
-- [ ] Database integration
-- [ ] Authentication
-- [ ] Kafka transaction streaming
-- [ ] Cloud deployment
-- [ ] Security controls
-- [ ] Monitoring and logging
+Example:
 
-### Phase 4 — Advanced Platform
+```text
+/api/transaction/UTR26082400001107
+```
 
-- [ ] Analyst dashboard
-- [ ] Real-time transaction stream
-- [ ] Fraud trend analytics
-- [ ] Model monitoring
-- [ ] Automated feedback and retraining
-- [ ] Production payment-gateway integration
+### Search
 
----
+```http
+GET /api/search
+```
 
-## 🏆 HyperFusion 2026
+Supported filters:
 
-**Project:** FinGuard AI  
-**Theme:** Fin-Tech  
-**Team:** Team NEXORA
+| Parameter | Example |
+|---|---|
+| `label` | `Fraud` |
+| `risk` | `HIGH` |
+| `method` | `UPI` |
+| `state` | `West Bengal` |
+| `city` | `Kolkata` |
+| `min_amount` | `40000` |
+| `max_amount` | `100000` |
+| `min_risk` | `70` |
+| `max_risk` | `100` |
+| `limit` | `20` |
 
-The HyperFusion 2026 proposal defines FinGuard AI as a real-time financial fraud-detection concept targeting UPI and card transactions, with a proposed risk-scoring and decision layer designed around rapid transaction analysis.
+Example:
 
----
+```text
+/api/search?risk=HIGH&method=UPI&state=Delhi&min_amount=40000&limit=10
+```
 
-## 🧩 Built With
+### Statistics
 
-This project was built with the help of **Claude Sonnet 5** (Anthropic), used as a development assistant for:
+```http
+GET /api/stats
+```
 
-- Writing and structuring the frontend (`index.html` — HTML/CSS/JS)
-- Building the FastAPI backend (`api/index.py`) for the Vercel deployment
-- Drafting and refining this README and project documentation
+Returns total records, fraud/genuine counts, and LOW/MEDIUM/HIGH risk counts.
 
-**Important for judges:** No AI model runs inside the live application. The `Risk_Score_0_100` and `Fraud_Risk_Reason` values are pre-computed fields stored directly in the synthetic dataset — the current demo performs lookup and display only, it does not perform live inference. Claude was a tool used *to build* the project, not a component running *inside* it. Live AI-driven scoring (XGBoost / anomaly detection) is planned for **Phase 2** of the [Roadmap](#️-roadmap).
+## 🧪 Example curl commands
 
----
+```bash
+curl http://127.0.0.1:8000/api/health
+```
 
-Built by **Team NEXORA** for **HyperFusion 2026**.
+```bash
+curl http://127.0.0.1:8000/api/transaction/UTR26082400001107
+```
 
----
+```bash
+curl "http://127.0.0.1:8000/api/search?risk=HIGH&method=UPI&limit=5"
+```
 
-## 🤝 Contributing
+```bash
+curl http://127.0.0.1:8000/api/stats
+```
 
-This project started as a hackathon prototype for HyperFusion 2026. Contributions, issues, and feature suggestions are welcome:
+## 🔐 Security notes
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Open a pull request describing what you changed and why
+This repository is a demonstration project.
 
-For larger changes (e.g. work toward Phase 2/3 of the roadmap), please open an issue first to discuss the approach.
+The included dataset is synthetic and should not be treated as real banking or personally identifiable financial information.
 
----
+For a production deployment:
 
-## 📚 Research & References
+- Do not expose real customer transaction data in a public repository.
+- Add authentication and authorization.
+- Add rate limiting.
+- Validate and sanitize all user input.
+- Move transaction storage to a proper database.
+- Store secrets in Vercel Environment Variables.
+- Add audit logging.
+- Add monitoring and alerting.
+- Use HTTPS-only production access.
+- Do not expose sensitive payment credentials, card numbers, CVV values, passwords, or authentication secrets.
 
-The project proposal references the following resources:
+## 📈 Future improvements
 
-1. **NPCI — UPI Overview & Ecosystem** — [npci.org.in](https://www.npci.org.in/what-we-do/upi/product-overview)
-2. **RBI — Digital Payment Security Controls** — [rbi.org.in](https://www.rbi.org.in/)
-3. **XGBoost — Official Documentation** — [xgboost.readthedocs.io](https://xgboost.readthedocs.io/)
-4. **Apache Kafka — Official Documentation** — [kafka.apache.org](https://kafka.apache.org/documentation/)
-5. **Kaggle — Credit Card Fraud Detection Dataset** — [kaggle.com](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+- PostgreSQL / Supabase transaction storage
+- JWT or OAuth authentication
+- Real-time transaction ingestion
+- Isolation Forest anomaly detection
+- Supervised fraud classification
+- Explainable risk scoring
+- Redis caching
+- Pagination and cursor-based search
+- Admin dashboard
+- Model monitoring
+- Automated tests and CI/CD
 
----
+## 🧩 Architecture
 
-## ⚠️ Disclaimer
+```text
+                    ┌─────────────────────┐
+                    │     User / Browser  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │     index.html      │
+                    │   FinGuard AI UI    │
+                    └──────────┬──────────┘
+                               │
+                         REST / JSON
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Vercel Function   │
+                    │   FastAPI / Python  │
+                    │     api/index.py    │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ transactions.json   │
+                    │ 15,000 synthetic    │
+                    │ transaction records │
+                    └─────────────────────┘
+```
 
-FinGuard AI is a **prototype / demonstration project**.
+## ⚠️ Important
 
-The current UTR lookup application uses synthetic/demo transaction data and should not be used to make real financial, banking, fraud, or payment decisions.
-
-The proposed AI architecture is a project design direction and does not represent a production-certified fraud-detection system.
-
----
+FinGuard AI is an educational/demo application. Its risk score and fraud labels are based on the supplied synthetic dataset and demonstration logic. They should not be used as the sole basis for real financial decisions.
 
 ## 📄 License
 
-No license has been specified for this project yet. Until a license is added, all rights are reserved by **Team NEXORA**, and the code should not be reused or redistributed without permission.
+Released under the MIT License. See [`LICENSE`](./LICENSE).
 
-> Consider adding an open-source license (e.g. MIT, Apache 2.0) if you intend for others to reuse this code.
+## 👤 Project
 
----
+**FinGuard AI**  
+Transaction Risk Lookup & Fraud Search
 
-## 📬 Contact
-
-For questions, feedback, or collaboration inquiries about FinGuard AI, please reach out via the repository's **Issues** tab or contact **Team NEXORA** through the HyperFusion 2026 event organizers.
-
----
-
-## ⭐ FinGuard AI
-
-> **Detect risk. Explain the signal. Protect the transaction.**
-
-**FinGuard AI — Protect Before the Payment Clears.**
+Built for learning, demonstration, and hackathon/project presentation purposes.
